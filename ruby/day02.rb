@@ -5,7 +5,7 @@ class Device
     twos = 0
     threes = 0
     str.split(/\s+/).each do |word|
-      counts = word.chop
+      counts = word.chomp
                    .each_char
                    .group_by(&:itself)
 
@@ -28,11 +28,11 @@ if __FILE__ == $0
 
     class DeviceTest < Minitest::Test
       def test_checksum
-        assert_equal 12, Device.checksum("abcdef bababc abbcde abcccd aabcdd ababab")
+        assert_equal 12, Device.checksum("abcdef bababc abbcde abcccd aabcdd abcdee ababab")
       end
     end
   else
-    input = ARGF.read.chomp
+    input = ARGF.read
     p Device.checksum input
   end
 end
