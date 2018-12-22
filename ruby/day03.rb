@@ -2,15 +2,25 @@
 
 Claim = Struct.new(:num, :left, :top, :width, :height) do
   def self.find_claims str
+    build_claims(str)
+      .select { |k,v| v.length > 1 }
+      .count
+  end
+
+  def self.find_isolated str
+    claims = from_str(str)
+    build_claims(str)
+  end
+
+  def self.build_claims str
     from_str(str)
-      .each_with_object(Hash.new(0)) { |claim,hash|
-        claim.width.times { |x|
-          claim.height.times { |y|
-            hash[[claim.left+x,claim.top+y]] += 1
+      .each_with_object(Hash.new{|hsh, key| hsh[key] = [] }) { |claim,hash|
+      claim.width.times { |x|
+        claim.height.times { |y|
+          hash[[claim.left+x,claim.top+y]] << claim.num
         }
       }
-    }.select { |k,v| v > 1 }
-    .count
+    }
   end
 
   def self.from_str str
@@ -39,8 +49,12 @@ if __FILE__ == $0
                 Claim.new(3, 5, 5, 2, 2)], Claim.from_str(INPUT)
       end
 
-      def test_overlap_counts
+      def test_find_claims
         assert_equal 4, Claim.find_claims(INPUT)
+      end
+
+      def test_find_isolated
+        assert_equal 3, Claim.find_isolated(INPUT)
       end
     end
   else
