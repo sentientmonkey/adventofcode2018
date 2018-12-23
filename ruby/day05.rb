@@ -19,6 +19,16 @@ class Alchemy
       end
     end
   end
+
+  def self.remove_specific_polymers polymers, specific
+    remove_polymers polymers.gsub(specific.upcase, '').gsub(specific.downcase, '')
+  end
+
+  def self.find_shortest_polymers polymers
+    ('a'..'z')
+      .map { |char| remove_specific_polymers polymers, char }
+      .min_by{ |r| r.length }
+  end
 end
 
 if __FILE__ == $0
@@ -34,6 +44,11 @@ if __FILE__ == $0
 
       def assert_same expected
         actual = Alchemy.remove_polymers expected
+        assert_equal expected, actual
+      end
+
+      def assert_remove_specific expected, original, specific
+        actual = Alchemy.remove_specific_polymers original, specific
         assert_equal expected, actual
       end
 
@@ -56,8 +71,22 @@ if __FILE__ == $0
         assert_remove 'dabCBAcaDA', 'dabAcCaCBAcCcaDA'
         assert_remove 'dabCBAcaDA', 'dabAcCaCBAcCcaDA'
       end
+
+      def test_remove_specific
+        original = 'dabAcCaCBAcCcaDA'
+        assert_remove_specific 'dbCBcD', original, 'a'
+        assert_remove_specific 'daCAcaDA', original, 'b'
+        assert_remove_specific 'daDA', original, 'c'
+        assert_remove_specific 'abCBAc', original, 'd'
+      end
+
+      def test_shortest_polymer
+        actual = Alchemy.find_shortest_polymers 'dabAcCaCBAcCcaDA'
+        assert_equal 4, actual.length
+      end
     end
   else
     puts Alchemy.remove_polymers(ARGF.read.chomp).length
+    puts Alchemy.find_shortest_polymers(ARGF.read.chomp).length
   end
 end
