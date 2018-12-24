@@ -40,7 +40,7 @@ class Guard
   end
 
   def sleepiest_minute_time
-    @sleep_times.max_by{ |_,total| total }.last
+    @sleep_times.values.max
   end
 
   def product
@@ -96,7 +96,17 @@ class GuardLog
   end
 
   def sleepiest_guard_by_minute
-    @guards.values.max_by{ |g| g.sleepiest_minute_time }
+    max_time = 0
+    max_minute = nil
+    max_gaurd = nil
+    @guards.values.each do |g|
+      if g.sleepiest_minute_time > max_time
+        max_minute = g.sleepiest_minute
+        max_gaurd = g
+      end
+    end
+
+    [max_minute, max_gaurd]
   end
 end
 
@@ -144,14 +154,14 @@ if __FILE__ == $0
       end
 
       def test_find_sleepiest_gaurd_minute
-        assert_equal 99, @subject.sleepiest_guard_by_minute.id
-        assert_equal 45, @subject.sleepiest_guard_by_minute.sleepiest_minute
-        assert_equal 4455, @subject.sleepiest_guard_by_minute.product
+        assert_equal 45, @subject.sleepiest_guard_by_minute.first
+        assert_equal 99, @subject.sleepiest_guard_by_minute.last.id
+        assert_equal 4455, @subject.sleepiest_guard_by_minute.first * @subject.sleepiest_guard_by_minute.last.id
       end
     end
   else
     g = GuardLog.new ARGF.read
     puts g.sleepiest_guard.product
-    puts g.sleepiest_guard_by_minute.product
+    puts g.sleepiest_guard_by_minute.first * g.sleepiest_guard_by_minute.last.id
   end
 end
