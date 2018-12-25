@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby -w
 
+
 module Enumerable
   def foldr m=nil
     reverse.inject(m){ |acc,i| yield acc, i }
@@ -8,16 +9,16 @@ end
 
 class Alchemy
   def self.remove_polymers polymers
-    polymers.chars.foldr("") do |ys,x|
-      y = if !ys.empty? then ys.chars.first; end
+    polymers.chars.foldr([]) do |ys,x|
+      y = if !ys.empty? then ys.first; end
       if y.nil?
-        x.to_s
+        [x]
       elsif y != x && y.upcase == x.upcase
         ys[1..ys.length-1]
       else
-        x + ys
+        ys.insert 0, x
       end
-    end
+    end.join ''
   end
 
   def self.remove_specific_polymers polymers, specific
@@ -86,7 +87,8 @@ if __FILE__ == $0
       end
     end
   else
-    puts Alchemy.remove_polymers(ARGF.read.chomp).length
-    puts Alchemy.find_shortest_polymers(ARGF.read.chomp).length
+    input = ARGF.read.chomp
+    puts Alchemy.remove_polymers(input).length
+    puts Alchemy.find_shortest_polymers(input).length
   end
 end
